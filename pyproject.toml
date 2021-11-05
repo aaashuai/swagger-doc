@@ -1,0 +1,8 @@
+[build-system]
+requires = [
+"setuptools>=42",
+"wheel",
+"pydantic",
+"tornado",
+]
+build-backend = "setuptools.build_meta"
