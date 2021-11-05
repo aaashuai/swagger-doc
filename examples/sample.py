@@ -1,7 +1,7 @@
 import tornado.ioloop
 import tornado.web
 
-from models import SwaggerTag, Resp
+from models import SwaggerTag, SuccessResp
 from swagger_doc import setup_swagger, swagger_doc, SResponse200
 
 
@@ -9,7 +9,7 @@ class MainHandler(tornado.web.RequestHandler):
     @swagger_doc(
         tags=[SwaggerTag.home],
         summary="show home page",
-        responses=[SResponse200(body=Resp)],
+        responses=[SResponse200(body=SuccessResp)],
     )
     def get(self):
         self.write("Hello, world")
