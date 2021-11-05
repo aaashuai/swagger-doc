@@ -1,7 +1,7 @@
 import tornado.ioloop
 import tornado.web
 
-from examples.models import SwaggerTag, RequestQuery, RequestBody, RequestPath, UnauthorizedResp, SuccessResp
+from models import SwaggerTag, RequestQuery, RequestBody, RequestPath, UnauthorizedResp, SuccessResp
 from swagger_doc import setup_swagger, swagger_doc, SResponse200, SResponse401
 
 
