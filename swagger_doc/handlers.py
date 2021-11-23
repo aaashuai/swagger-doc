@@ -4,6 +4,8 @@ import json
 
 import tornado.web
 
+from .utils import CJsonEncoder
+
 __all__ = [
     "TornadoHandler",
     "SwaggerHomeHandler",
@@ -40,9 +42,7 @@ def basic_auth(auth):
             if not auth_header.startswith("Basic "):
                 return _request_auth(handler)
 
-            auth_decoded = base64.decodebytes(auth_header[6:].encode("utf8")).decode(
-                "utf8"
-            )
+            auth_decoded = base64.decodebytes(auth_header[6:].encode("utf8")).decode("utf8")
             username, password = auth_decoded.split(":", 2)
 
             if auth(username, password):
@@ -74,6 +74,4 @@ class OpenapiHomeHandler(TornadoHandler):
     @basic_auth(api_auth)
     def get(self):
         self.set_header("Content-Type", "application/json; charset=UTF-8")
-        self.write(
-            json.dumps(self.SWAGGER_JSON, ensure_ascii=False).replace("</", "<\\/")
-        )
+        self.write(json.dumps(self.SWAGGER_JSON, ensure_ascii=False, cls=CJsonEncoder).replace("</", "<\\/"))

@@ -1,28 +1,23 @@
 import collections
 import logging
 import os
+import queue
 import re
 import typing
-import queue
+from inspect import getfullargspec
 
-from tornado.web import URLSpec
 import tornado.web
 import yaml
 from jinja2 import BaseLoader
 from jinja2 import Environment
-from inspect import getfullargspec
+from tornado.web import URLSpec
 
 if typing.TYPE_CHECKING:
     from .models import SSecurity, DocModel
 
-SWAGGER_TEMPLATE = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "templates", "swagger.yaml")
-)
+SWAGGER_TEMPLATE = os.path.abspath(os.path.join(os.path.dirname(__file__), "templates", "swagger.yaml"))
 replace_symbols = {"/", "$", "(", ")", "{", "}"}
-replace_map = {
-    ord(k): v
-    for k, v in dict(zip(replace_symbols, ["_"] * len(replace_symbols))).items()
-}
+replace_map = {ord(k): v for k, v in dict(zip(replace_symbols, ["_"] * len(replace_symbols))).items()}
 
 
 def build_doc_from_func_doc(handler, route_path, security: "SSecurity"):
@@ -33,9 +28,7 @@ def build_doc_from_func_doc(handler, route_path, security: "SSecurity"):
         swagger: "DocModel" = getattr(getattr(handler, method), "__swagger__", None)
         if swagger:
             d = swagger.gen_doc()
-            d[
-                "operationId"
-            ] = f"{method}_{handler.__name__}_{route_path.translate(replace_map)}"
+            d["operationId"] = f"{method}_{handler.__name__}_{route_path.translate(replace_map)}"
             if swagger.auth_required and security:
                 d["security"] = security.get_security()
             out.update({method: d})
@@ -154,9 +147,7 @@ def generate_doc_from_endpoints(
             raise ValueError(f"Unknown route: {item}")
 
         target = route.target
-        route_path = format_handler_path(
-            target, route.regex.pattern, route.regex.groups
-        )
+        route_path = format_handler_path(target, route.regex.pattern, route.regex.groups)
         doc = build_doc_from_func_doc(target, route_path, security)
         if not doc:
             continue

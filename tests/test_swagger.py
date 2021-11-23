@@ -564,3 +564,69 @@ def test_auth():
             "in": "header",
         },
     }, "get security schema failed"
+
+
+def test_bytes():
+    class TBody(SBody):
+        __example__ = {
+            "name": b"abc",
+        }
+
+        name: bytes = Field(description="姓名", alias="Name")
+
+    @swagger_doc(
+        tags=["eis"],
+        summary="eis",
+        desc="eis",
+        request_body=TBody,
+        responses=[SResponse200(body=SuccessResp)],
+    )
+    def post(id):
+        pass
+
+    assert post.__swagger__.gen_doc() == {
+        "tags": ["eis"],
+        "summary": "eis",
+        "description": "eis",
+        "parameters": [],
+        "requestBody": {
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "description": "request body",
+                        "properties": {
+                            "Name": {
+                                "description": "姓名",
+                                "type": "string",
+                                "format": "binary",
+                                "required": True,
+                            }
+                        },
+                    },
+                    "example": {"name": b"abc"},
+                }
+            }
+        },
+        "responses": {
+            "200": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "description": "request body",
+                            "properties": {
+                                "name": {
+                                    "description": "姓名",
+                                    "type": "string",
+                                    "required": True,
+                                }
+                            },
+                        },
+                        "example": {"name": "李四"},
+                    }
+                },
+            }
+        },
+    }

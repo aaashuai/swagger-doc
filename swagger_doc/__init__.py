@@ -1,6 +1,5 @@
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 
-import datetime
 import importlib
 import json
 import os
@@ -9,12 +8,11 @@ from pathlib import Path
 from typing import List, Type, Union
 
 import tornado.web
-from pydantic import BaseModel
 
 from .builders import generate_doc_from_endpoints
 from .handlers import *
 from .models import *
-
+from .utils import CJsonEncoder
 
 STATIC_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "swagger_ui"))
 
@@ -39,27 +37,6 @@ def export_swagger(
         external_docs=external_docs,
         security=security,
     )
-
-
-class CJsonEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, datetime.datetime):
-            return obj.strftime("%Y-%m-%d %H:%M:%S")
-        elif isinstance(obj, datetime.date):
-            return obj.strftime("%Y-%m-%d")
-        elif isinstance(obj, datetime.timedelta):
-            return {
-                "__type__": "timedelta",
-                "days": obj.days,
-                "seconds": obj.seconds,
-                "microseconds": obj.microseconds,
-            }
-        elif isinstance(obj, BaseModel):
-            return obj.dict()
-        elif isinstance(obj, bytes):
-            return obj.decode("utf8")
-        else:
-            return json.JSONEncoder.default(self, obj)
 
 
 def setup_swagger(
@@ -88,12 +65,8 @@ def setup_swagger(
         security=security,
     )
 
-    _swagger_url = (
-        "/{}".format(swagger_url) if not swagger_url.startswith("/") else swagger_url
-    )
-    _openapi_url = (
-        "/{}".format(openapi_url) if not openapi_url.startswith("/") else openapi_url
-    )
+    _swagger_url = "/{}".format(swagger_url) if not swagger_url.startswith("/") else swagger_url
+    _openapi_url = "/{}".format(openapi_url) if not openapi_url.startswith("/") else openapi_url
     _base_swagger_url = _swagger_url.rstrip("/")
 
     routes += [

@@ -51,9 +51,7 @@ def _parse_one_model(_item, definitions: dict, field: str, required: list):
 
     # 对象
     elif "$ref" in _item:
-        return _get_ref_model(
-            _item["$ref"], definitions, field, _item.get("description")
-        )
+        return _get_ref_model(_item["$ref"], definitions, field, _item.get("description"))
     # 枚举
     elif "allOf" in _item:
         return {
@@ -79,6 +77,8 @@ def _parse_one_model(_item, definitions: dict, field: str, required: list):
         ret = {"description": _item.get("description", "")}
         if "type" in _item:
             ret.update(type=_item["type"])
+        if "format" in _item:
+            ret.update(format=_item["format"])
         if required:
             ret.update(required=field in required)
         if "enum" in _item:
@@ -94,9 +94,7 @@ def _get_ref_model(ref: str, definitions: dict, field: str, description: str = N
         return _parse_one_model(item, definitions, field, item.get("required", []))
     ret = {
         "type": "object",
-        "properties": _parse_one_model(
-            item, definitions, field, item.get("required", [])
-        ),
+        "properties": _parse_one_model(item, definitions, field, item.get("required", [])),
     }
     if description:
         ret.update(description=description)
@@ -115,22 +113,15 @@ class SParam(BaseModel):
 
         ret = []
         for field, _item in schema["properties"].items():
-            one_schema = _parse_one_model(
-                _item, schema.get("definitions", {}), field, schema.get("required", [])
-            )
+            one_schema = _parse_one_model(_item, schema.get("definitions", {}), field, schema.get("required", []))
             one = {
                 "name": field,
                 "in": cls.__p_type__,
-                "description": _item.get("description")
-                or cls.parse_description(one_schema),
+                "description": _item.get("description") or cls.parse_description(one_schema),
                 "required": field in schema.get("required", []),
                 "schema": one_schema,
             }
-            example = (
-                cls.__example__.get(field)
-                if isinstance(cls.__example__, dict)
-                else cls.__example__
-            )
+            example = cls.__example__.get(field) if isinstance(cls.__example__, dict) else cls.__example__
             if example:
                 one.update(example=example)
             ret.append(one)
@@ -363,8 +354,6 @@ class DocModel(BaseModel):
             return f"{c}.{code_set[c]}"
 
         ret["responses"] = {
-            _get_next_code(code): content
-            for i in self.responses
-            for code, content in i.get_json().items()
+            _get_next_code(code): content for i in self.responses for code, content in i.get_json().items()
         }
         return ret
