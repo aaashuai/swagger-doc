@@ -1,4 +1,4 @@
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 
 import importlib
 import json
@@ -74,10 +74,22 @@ def setup_swagger(
         tornado.web.url(_openapi_url, OpenapiHomeHandler),
         tornado.web.url("{}/".format(_base_swagger_url), SwaggerHomeHandler),
     ]
+    with open(os.path.join(STATIC_PATH, "swagger-ui-bundle.js"), "r") as f:
+        swagger_ui_bundle_js = f.read()
+
+    with open(os.path.join(STATIC_PATH, "swagger-ui-standalone-preset.js"), "r") as f:
+        swagger_ui_standalone_preset_js = f.read()
+
+    with open(os.path.join(STATIC_PATH, "swagger-ui.css"), "r") as f:
+        swagger_ui_css = f.read()
 
     with open(os.path.join(STATIC_PATH, "ui.jinja2"), "r") as f:
-        SwaggerHomeHandler.SWAGGER_HOME_TEMPLATE = f.read().replace(
-            "{{ SWAGGER_SCHEMA }}", json.dumps(swagger_schema, cls=CJsonEncoder)
+        SwaggerHomeHandler.SWAGGER_HOME_TEMPLATE = (
+            f.read()
+            .replace("{{ SWAGGER_SCHEMA }}", json.dumps(swagger_schema, cls=CJsonEncoder))
+            .replace("{{ SWAGGER-CSS }}", swagger_ui_css)
+            .replace("{{ SWAGGER-UI-BUNDLE }}", swagger_ui_bundle_js)
+            .replace("{{ SWAGGER-UI-STANDALONE-PRESET }}", swagger_ui_standalone_preset_js)
         )
     OpenapiHomeHandler.SWAGGER_JSON = swagger_schema
     SwaggerUser.USERNAME = login_username
