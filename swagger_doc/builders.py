@@ -147,6 +147,9 @@ def generate_doc_from_endpoints(
             raise ValueError(f"Unknown route: {item}")
 
         target = route.target
+        if not target:
+            continue
+
         route_path = format_handler_path(target, route.regex.pattern, route.regex.groups)
         doc = build_doc_from_func_doc(target, route_path, security)
         if not doc:
