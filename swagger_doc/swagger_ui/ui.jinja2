@@ -45,7 +45,18 @@
                 layout: "StandaloneLayout",
                 // 按 get, post, put, delete 排序
                 operationsSorter: function (a, b) {
-                    let order = {'get': '0', 'post': '1', 'put': '2', 'delete': '3'};
+                    let order = {
+                        'get': '0',
+                        'post': '1',
+                        'put': '2',
+                        'delete': '3',
+                        'head': '4',
+                        'options': '5',
+                        'connect': '6',
+                        'trace': '7',
+                        'patch': '8',
+                    };
+
                     return order[a._root.entries[1][1]].localeCompare(order[b._root.entries[1][1]]);
                 },
                 // 按tag排序
