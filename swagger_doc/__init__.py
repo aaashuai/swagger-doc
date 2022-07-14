@@ -1,4 +1,4 @@
-__version__ = "0.0.7"
+__version__ = "0.0.8"
 
 import importlib
 import json
@@ -15,7 +15,7 @@ from .models import *
 from .models import SObjectMeta
 from .utils import CJsonEncoder
 
-STATIC_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "swagger_ui"))
+STATIC_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "static"))
 
 
 def export_swagger(
@@ -40,9 +40,49 @@ def export_swagger(
     )
 
 
+def load_swagger_template(openapi_schema):
+    base_path = os.path.join(STATIC_PATH, "swagger_ui")
+    with open(os.path.join(base_path, "swagger-ui-bundle.js"), "r") as f:
+        swagger_ui_bundle_js = f.read()
+
+    with open(os.path.join(base_path, "swagger-ui-standalone-preset.js"), "r") as f:
+        swagger_ui_standalone_preset_js = f.read()
+
+    with open(os.path.join(base_path, "swagger-ui.css"), "r") as f:
+        swagger_ui_css = f.read()
+
+    with open(os.path.join(base_path, "ui.jinja2"), "r") as f:
+        SwaggerHomeHandler.SWAGGER_HOME_TEMPLATE = (
+            f.read()
+            .replace("{{ SWAGGER_SCHEMA }}", json.dumps(openapi_schema, cls=CJsonEncoder))
+            .replace("{{ SWAGGER-CSS }}", swagger_ui_css)
+            .replace("{{ SWAGGER-UI-BUNDLE }}", swagger_ui_bundle_js)
+            .replace("{{ SWAGGER-UI-STANDALONE-PRESET }}", swagger_ui_standalone_preset_js)
+        )
+
+
+def load_redoc_template(openapi_schema):
+    base_path = os.path.join(STATIC_PATH, "redoc_ui")
+
+    with open(os.path.join(base_path, "redoc.css"), "r") as f:
+        redoc_css = f.read()
+
+    with open(os.path.join(base_path, "redoc.js"), "r") as f:
+        redoc_js = f.read()
+
+    with open(os.path.join(base_path, "ui.jinja2"), "r") as f:
+        RedocHomeHandler.REDOC_HOME_TEMPLATE = (
+            f.read()
+            .replace("{{ REDOC_JSON }}", json.dumps(openapi_schema, cls=CJsonEncoder))
+            .replace("{{ REDOC_CSS }}", redoc_css)
+            .replace("{{ REDOC_JS }}", redoc_js)
+        )
+
+
 def setup_swagger(
     routes,
     swagger_url="/docs",
+    redoc_url="/redoc",
     openapi_url="/openapi.json",
     servers=None,
     description="Swagger API definition",
@@ -55,7 +95,7 @@ def setup_swagger(
     login_password: str = "swagger",
     swagger_model_path=None,
 ):
-    swagger_schema = generate_doc_from_endpoints(
+    openapi_schema = generate_doc_from_endpoints(
         routes,
         servers=servers,
         description=description,
@@ -68,31 +108,21 @@ def setup_swagger(
 
     _swagger_url = "/{}".format(swagger_url) if not swagger_url.startswith("/") else swagger_url
     _openapi_url = "/{}".format(openapi_url) if not openapi_url.startswith("/") else openapi_url
+    _redoc_url = "/{}".format(redoc_url) if not redoc_url.startswith("/") else redoc_url
     _base_swagger_url = _swagger_url.rstrip("/")
+    _base_redoc_url = _redoc_url.rstrip("/")
 
     routes += [
         tornado.web.url(_swagger_url, SwaggerHomeHandler),
+        tornado.web.url(_redoc_url, RedocHomeHandler),
         tornado.web.url(_openapi_url, OpenapiHomeHandler),
         tornado.web.url("{}/".format(_base_swagger_url), SwaggerHomeHandler),
+        tornado.web.url("{}/".format(_base_redoc_url), RedocHomeHandler),
     ]
-    with open(os.path.join(STATIC_PATH, "swagger-ui-bundle.js"), "r") as f:
-        swagger_ui_bundle_js = f.read()
+    load_swagger_template(openapi_schema)
+    load_redoc_template(openapi_schema)
 
-    with open(os.path.join(STATIC_PATH, "swagger-ui-standalone-preset.js"), "r") as f:
-        swagger_ui_standalone_preset_js = f.read()
-
-    with open(os.path.join(STATIC_PATH, "swagger-ui.css"), "r") as f:
-        swagger_ui_css = f.read()
-
-    with open(os.path.join(STATIC_PATH, "ui.jinja2"), "r") as f:
-        SwaggerHomeHandler.SWAGGER_HOME_TEMPLATE = (
-            f.read()
-            .replace("{{ SWAGGER_SCHEMA }}", json.dumps(swagger_schema, cls=CJsonEncoder))
-            .replace("{{ SWAGGER-CSS }}", swagger_ui_css)
-            .replace("{{ SWAGGER-UI-BUNDLE }}", swagger_ui_bundle_js)
-            .replace("{{ SWAGGER-UI-STANDALONE-PRESET }}", swagger_ui_standalone_preset_js)
-        )
-    OpenapiHomeHandler.SWAGGER_JSON = swagger_schema
+    OpenapiHomeHandler.OPENAPI_JSON = openapi_schema
     SwaggerUser.USERNAME = login_username
     SwaggerUser.PASSWORD = login_password
 

@@ -9,6 +9,7 @@ from .utils import CJsonEncoder
 __all__ = [
     "TornadoHandler",
     "SwaggerHomeHandler",
+    "RedocHomeHandler",
     "OpenapiHomeHandler",
     "SwaggerUser",
 ]
@@ -68,10 +69,18 @@ class SwaggerHomeHandler(TornadoHandler):
         self.write(self.SWAGGER_HOME_TEMPLATE)
 
 
+class RedocHomeHandler(TornadoHandler):
+    REDOC_HOME_TEMPLATE = ""
+
+    @basic_auth(api_auth)
+    def get(self):
+        self.write(self.REDOC_HOME_TEMPLATE)
+
+
 class OpenapiHomeHandler(TornadoHandler):
-    SWAGGER_JSON = ""
+    OPENAPI_JSON = ""
 
     @basic_auth(api_auth)
     def get(self):
         self.set_header("Content-Type", "application/json; charset=UTF-8")
-        self.write(json.dumps(self.SWAGGER_JSON, ensure_ascii=False, cls=CJsonEncoder).replace("</", "<\\/"))
+        self.write(json.dumps(self.OPENAPI_JSON, ensure_ascii=False, cls=CJsonEncoder).replace("</", "<\\/"))

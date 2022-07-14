@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Redoc</title>
+    <!-- needed for adaptive design -->
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--
+    Redoc doesn't change outer page styles
+    -->
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      {{ REDOC_CSS }}
+    </style>
+  </head>
+  <body>
+      <redoc id="redoc-container"></redoc>
+
+    <script type="text/javascript">
+        {{ REDOC_JS }}
+
+        Redoc.init({{ REDOC_JSON }}, {
+          scrollYOffset: 50
+        }, document.getElementById('redoc-container'))
+    </script>
+  </body>
+</html>

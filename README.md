@@ -69,6 +69,7 @@ class AppWithSwagger(tornado.web.Application):
         setup_swagger(
             routes,
             swagger_url="/docs",
+            redoc_url="/redoc",
             openapi_url="/openapi.json",
             description="",
             api_version="1.0.0",
@@ -92,8 +93,11 @@ if __name__ == "__main__":
 default account&password: swagger:swagger  
 <img src="https://user-images.githubusercontent.com/39478406/140527121-d282c21b-1b21-4fa4-ae43-c37bef114d2e.png" width="455px" alt="wechaty" />
 
-### Docs  
+### Swagger
 <img src="https://user-images.githubusercontent.com/39478406/140530562-390734ba-0d6e-4eaf-8998-9fac8d16092e.png" width="455px" alt="wechaty" />
+
+### Redoc  
+<img src="https://raw.githubusercontent.com/aaashuai/Images/master/20220714205451.png" width="455px" alt="wechaty" />
 
 ## Examples
 see [examples](https://github.com/aaashuai/swagger-doc/tree/master/examples)

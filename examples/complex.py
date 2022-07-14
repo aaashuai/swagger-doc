@@ -55,4 +55,5 @@ if __name__ == "__main__":
     app = make_app()
     app.listen(8887)
     print(f"docs: http://localhost:8887/docs")
+    print(f"docs: http://localhost:8887/redoc")
     tornado.ioloop.IOLoop.current().start()
