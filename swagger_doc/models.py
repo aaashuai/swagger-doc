@@ -15,7 +15,9 @@ __all__ = [
     "SPath",
     "SHeader",
     "SQuery",
+    "SObjectMeta",
     "SBody",
+    "SForm",
     "SObject",
     "SSecurity",
     "SecurityType",
@@ -107,7 +109,7 @@ class SParam(BaseModel):
     ...
 
     @classmethod
-    def get_json(cls) -> List[dict]:
+    def gen_schema(cls) -> List[dict]:
         assert cls.__p_type__ is not None, ValueError("do not use Base Param")
         schema = cls.schema()
 
@@ -152,11 +154,12 @@ class SHeader(SParam):
     __p_type__ = "header"
 
 
-class SObject(BaseModel):
+class SObjectMeta(BaseModel):
     __example__ = None
+    __content_type__ = None
 
     @classmethod
-    def get_json(cls):
+    def _gen_properties(cls):
         assert cls.__example__ is not None, ValueError("do not use Body base")
         schema = cls.schema()
 
@@ -175,9 +178,15 @@ class SObject(BaseModel):
 
         properties = parse_model_recursively()
 
+        return properties
+
+    @classmethod
+    def gen_schema(cls):
+        properties = cls._gen_properties()
+
         return {
             "content": {
-                "application/json": {
+                cls.__content_type__: {
                     "schema": {
                         "type": "object",
                         "description": "request body",
@@ -189,7 +198,17 @@ class SObject(BaseModel):
         }
 
 
-SBody = SObject
+class SObject(SObjectMeta):
+    __example__ = None
+    __content_type__ = "application/json"
+
+
+class SForm(SObjectMeta):
+    __example__ = None
+    __content_type__ = "multipart/form-data"
+
+
+SJsonBody = SBody = SObject
 
 
 class SecurityType(Enum):
@@ -272,11 +291,11 @@ class SResponse(BaseModel):
     description: str
     body: Optional[Type[SObject]] = None
 
-    def get_json(self):
+    def gen_schema(self):
         return {
             self.status_code: {
                 "description": self.description,
-                **self.body.get_json(),
+                **self.body.gen_schema(),
             }
         }
 
@@ -316,7 +335,7 @@ class DocModel(BaseModel):
     desc: str
     responses: List[SResponse]
     auth_required: bool
-    request_body: Type[SBody] = None
+    request_body: Type[SObjectMeta] = None
     path_params: Type[SParam] = None
     query_params: Type[SQuery] = None
     header_params: Type[SHeader] = None
@@ -335,13 +354,13 @@ class DocModel(BaseModel):
             "parameters": [],
         }
         if self.header_params:
-            ret["parameters"].extend(self.header_params.get_json())
+            ret["parameters"].extend(self.header_params.gen_schema())
         if self.path_params:
-            ret["parameters"].extend(self.path_params.get_json())
+            ret["parameters"].extend(self.path_params.gen_schema())
         if self.query_params:
-            ret["parameters"].extend(self.query_params.get_json())
+            ret["parameters"].extend(self.query_params.gen_schema())
         if self.request_body:
-            ret["requestBody"] = self.request_body.get_json()
+            ret["requestBody"] = self.request_body.gen_schema()
 
         code_set = {}
 
@@ -354,6 +373,6 @@ class DocModel(BaseModel):
             return f"{c}.{code_set[c]}"
 
         ret["responses"] = {
-            _get_next_code(code): content for i in self.responses for code, content in i.get_json().items()
+            _get_next_code(code): content for i in self.responses for code, content in i.gen_schema().items()
         }
         return ret

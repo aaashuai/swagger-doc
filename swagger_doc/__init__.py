@@ -12,6 +12,7 @@ import tornado.web
 from .builders import generate_doc_from_endpoints
 from .handlers import *
 from .models import *
+from .models import SObjectMeta
 from .utils import CJsonEncoder
 
 STATIC_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "swagger_ui"))
@@ -124,7 +125,7 @@ def swagger_doc(
     summary: str,
     responses: List[SResponse],
     desc: str = None,
-    request_body: Type[SBody] = None,
+    request_body: Type[SObjectMeta] = None,
     path_params: Type[SPath] = None,
     query_params: Type[SQuery] = None,
     header_params: Type[SHeader] = None,

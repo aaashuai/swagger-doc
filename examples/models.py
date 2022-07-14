@@ -10,6 +10,7 @@ from swagger_doc.models import (
     SBody,
     SPath,
     SQuery,
+    SForm,
 )
 
 # 定义bearer_auth
@@ -29,6 +30,7 @@ swagger_security = SSecurity(security=[signature_auth, token_auth])
 
 class SwaggerTag(STag):
     home = "home"
+    form = "form"
 
 
 class RequestPath(SPath):
@@ -47,6 +49,13 @@ class RequestBody(SBody):
     __example__ = {"name": "lisi"}
 
     name: str = Field(description="name")
+
+
+class RequestForm(SForm):
+    __example__ = {"name": "lisi", "file": b"xxx"}
+
+    name: str = Field(description="name")
+    file: bytes = Field(description="file")
 
 
 class Resp(SObject):

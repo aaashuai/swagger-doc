@@ -1,10 +1,10 @@
 from enum import IntEnum
 from typing import Optional
 
-from pydantic import Field
+from pydantic import Field, BaseModel
 
 from swagger_doc import *
-from swagger_doc.models import SecurityModel, SecurityType, SecuritySchema, SResponse200
+from swagger_doc.models import SecurityModel, SecurityType, SecuritySchema, SResponse200, SForm
 
 
 class TQuery(SQuery):
@@ -623,6 +623,61 @@ def test_bytes():
                                     "required": True,
                                 }
                             },
+                        },
+                        "example": {"name": "李四"},
+                    }
+                },
+            }
+        },
+    }
+
+
+def test_multi_part_request():
+    class TForm(SForm):
+        __example__ = {"name": "abc", "file": b"xxx"}
+
+        file: bytes = Field(description="文件")
+        name: str = Field(description="名称")
+
+    @swagger_doc(
+        tags=["form"],
+        summary="form",
+        desc="form",
+        request_body=TForm,
+        responses=[SResponse200(body=SuccessResp)],
+    )
+    def post(id):
+        pass
+
+    assert post.__swagger__.gen_doc() == {
+        "tags": ["form"],
+        "summary": "form",
+        "description": "form",
+        "parameters": [],
+        "requestBody": {
+            "content": {
+                "multipart/form-data": {
+                    "schema": {
+                        "type": "object",
+                        "description": "request body",
+                        "properties": {
+                            "file": {"description": "文件", "type": "string", "format": "binary", "required": True},
+                            "name": {"description": "名称", "type": "string", "required": True},
+                        },
+                    },
+                    "example": {"name": "abc", "file": b"xxx"},
+                }
+            }
+        },
+        "responses": {
+            "200": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "description": "request body",
+                            "properties": {"name": {"description": "姓名", "type": "string", "required": True}},
                         },
                         "example": {"name": "李四"},
                     }

@@ -1,7 +1,7 @@
 import tornado.ioloop
 import tornado.web
 
-from models import SwaggerTag, RequestQuery, RequestBody, RequestPath, UnauthorizedResp, SuccessResp
+from models import SwaggerTag, RequestQuery, RequestBody, RequestPath, UnauthorizedResp, SuccessResp, RequestForm
 from swagger_doc import setup_swagger, swagger_doc, SResponse200, SResponse401
 
 
@@ -10,11 +10,22 @@ class MainHandler(tornado.web.RequestHandler):
         tags=[SwaggerTag.home],
         summary="show home page",
         query_params=RequestQuery,
-        path_params=RequestPath,
         request_body=RequestBody,
         responses=[SResponse200(body=SuccessResp), SResponse401(body=UnauthorizedResp)],
     )
-    def put(self, id_):
+    def put(self):
+        self.write("Hello, world")
+
+
+class FormHandler(tornado.web.RequestHandler):
+    @swagger_doc(
+        tags=[SwaggerTag.form],
+        summary="post a form",
+        path_params=RequestPath,
+        request_body=RequestForm,
+        responses=[SResponse200(body=SuccessResp), SResponse401(body=UnauthorizedResp)],
+    )
+    def post(self, id_):
         self.write("Hello, world")
 
 
@@ -32,7 +43,12 @@ class AppWithSwagger(tornado.web.Application):
 
 
 def make_app():
-    return AppWithSwagger([(r"/", MainHandler)])
+    return AppWithSwagger(
+        [
+            (r"/", MainHandler),
+            (r"/form/(.*)", FormHandler),
+        ]
+    )
 
 
 if __name__ == "__main__":
