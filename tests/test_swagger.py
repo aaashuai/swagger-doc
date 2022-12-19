@@ -157,7 +157,7 @@ def test_gen_doc():
                             },
                             "ELike": {
                                 "type": "array",
-                                "items": {"type": "string"},
+                                "items": {"description": "", "required": True, "type": "string"},
                                 "description": "elike",
                             },
                             "age": {
@@ -223,6 +223,7 @@ def test_enum():
         name: str
         status: Status
         bstatus: Union[Status, BStatus, str]
+        bstatusListp: Optional[List[Union[Status, BStatus, str]]]
 
     class CQuery(SQuery):
         __example__ = {
@@ -232,6 +233,7 @@ def test_enum():
         name: str
         status: Status = Field(description="状态")
         bstatus: Union[Status, BStatus, str]
+        bstatusListp: Optional[List[Union[Status, BStatus, str]]]
 
     @swagger_doc(
         tags=["eis"],
@@ -262,15 +264,7 @@ def test_enum():
                 "in": "query",
                 "description": "状态",
                 "required": True,
-                "schema": {
-                    "allOf": [
-                        {
-                            "description": "状态 1:online, 2:offline",
-                            "type": "integer",
-                            "enum": [1, 2],
-                        }
-                    ]
-                },
+                "schema": {"allOf": [{"description": "状态 1:online, 2:offline", "type": "integer", "enum": [1, 2]}]},
                 "example": 1,
             },
             {
@@ -280,18 +274,26 @@ def test_enum():
                 "required": True,
                 "schema": {
                     "anyOf": [
-                        {
-                            "description": "状态 1:online, 2:offline",
-                            "type": "integer",
-                            "enum": [1, 2],
-                        },
-                        {
-                            "description": "b状态 1:online, 2:offline",
-                            "type": "integer",
-                            "enum": [1, 2],
-                        },
+                        {"description": "状态 1:online, 2:offline", "type": "integer", "enum": [1, 2]},
+                        {"description": "b状态 1:online, 2:offline", "type": "integer", "enum": [1, 2]},
                         {"description": "", "type": "string", "required": True},
                     ]
+                },
+            },
+            {
+                "name": "bstatusListp",
+                "in": "query",
+                "description": "",
+                "required": False,
+                "schema": {
+                    "type": "array",
+                    "items": {
+                        "anyOf": [
+                            {"description": "状态 1:online, 2:offline", "type": "integer", "enum": [1, 2]},
+                            {"description": "b状态 1:online, 2:offline", "type": "integer", "enum": [1, 2]},
+                            {"description": "", "type": "string", "required": False},
+                        ]
+                    },
                 },
             },
         ],
@@ -302,34 +304,24 @@ def test_enum():
                         "type": "object",
                         "description": "request body",
                         "properties": {
-                            "name": {
-                                "description": "",
-                                "type": "string",
-                                "required": True,
-                            },
-                            "status": {
-                                "description": "状态 1:online, 2:offline",
-                                "type": "integer",
-                                "enum": [1, 2],
-                            },
+                            "name": {"description": "", "type": "string", "required": True},
+                            "status": {"description": "状态 1:online, 2:offline", "type": "integer", "enum": [1, 2]},
                             "bstatus": {
                                 "anyOf": [
-                                    {
-                                        "description": "状态 1:online, 2:offline",
-                                        "type": "integer",
-                                        "enum": [1, 2],
-                                    },
-                                    {
-                                        "description": "b状态 1:online, 2:offline",
-                                        "type": "integer",
-                                        "enum": [1, 2],
-                                    },
-                                    {
-                                        "description": "",
-                                        "type": "string",
-                                        "required": True,
-                                    },
+                                    {"description": "状态 1:online, 2:offline", "type": "integer", "enum": [1, 2]},
+                                    {"description": "b状态 1:online, 2:offline", "type": "integer", "enum": [1, 2]},
+                                    {"description": "", "type": "string", "required": True},
                                 ]
+                            },
+                            "bstatusListp": {
+                                "type": "array",
+                                "items": {
+                                    "anyOf": [
+                                        {"description": "状态 1:online, 2:offline", "type": "integer", "enum": [1, 2]},
+                                        {"description": "b状态 1:online, 2:offline", "type": "integer", "enum": [1, 2]},
+                                        {"description": "", "type": "string", "required": False},
+                                    ]
+                                },
                             },
                         },
                     },
@@ -345,13 +337,7 @@ def test_enum():
                         "schema": {
                             "type": "object",
                             "description": "request body",
-                            "properties": {
-                                "name": {
-                                    "description": "姓名",
-                                    "type": "string",
-                                    "required": True,
-                                }
-                            },
+                            "properties": {"name": {"description": "姓名", "type": "string", "required": True}},
                         },
                         "example": {"name": "李四"},
                     }
@@ -483,7 +469,7 @@ def test_description():
                             },
                             "ELike": {
                                 "type": "array",
-                                "items": {"type": "string"},
+                                "items": {"description": "", "required": True, "type": "string"},
                                 "description": "elike",
                             },
                             "age": {

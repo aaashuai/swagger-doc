@@ -42,10 +42,7 @@ def _parse_one_model(_item, definitions: dict, field: str, required: list):
         return ret
     # 数组
     elif "items" in _item:
-        if "$ref" in _item["items"]:
-            items = _get_ref_model(_item["items"]["$ref"], definitions, field)
-        else:
-            items = _item["items"]
+        items = _parse_one_model(_item["items"], definitions, field, required)
         ret = {"type": "array", "items": items}
         if _item.get("description"):
             ret.update(description=_item["description"])

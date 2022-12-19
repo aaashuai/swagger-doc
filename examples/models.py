@@ -1,3 +1,6 @@
+from enum import Enum
+from typing import List, Union, Optional
+
 from pydantic import Field
 
 from swagger_doc.models import (
@@ -28,9 +31,24 @@ signature_auth = [x_access_id, x_access_nonce]
 swagger_security = SSecurity(security=[signature_auth, token_auth])
 
 
+class EnumA(str, Enum):
+    """
+    a: A
+    """
+    a = "A"
+
+
+class EnumB(str, Enum):
+    """
+    b: B
+    """
+    b = "B"
+
+
 class SwaggerTag(STag):
     home = "home"
     form = "form"
+    enum = "enum"
 
 
 class RequestPath(SPath):
@@ -56,6 +74,18 @@ class RequestForm(SForm):
 
     name: str = Field(description="name")
     file: bytes = Field(description="file")
+
+
+class RequestEnum(SBody):
+    __example__ = {"e": ["a"]}
+
+    e: Optional[List[Union[EnumA, EnumB, str]]]
+
+
+class RequestEnumQuery(SQuery):
+    __example__ = {"e": ["a"]}
+
+    e: Optional[List[Union[EnumA, EnumB, str]]]
 
 
 class Resp(SObject):
