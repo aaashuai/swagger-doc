@@ -85,11 +85,12 @@ class RequestEnum(SBody):
 class RequestEnumQuery(SQuery):
     __example__ = {"e": ["a"]}
 
-    e: Optional[List[Union[EnumA, EnumB, str]]]
+    e: Optional[List[Union[EnumA, EnumB, str]]] = Field(description="测试e")
+    f: EnumA = Field(description="测试f", default=EnumA.a)
 
 
 class Resp(SObject):
-    __example__ = ...
+    __example__ = {"code": 0}
 
     code: str = Field(description="response code")
 

@@ -20,7 +20,8 @@ class EnumHandler(tornado.web.RequestHandler):
         responses=[SResponse200(body=SuccessResp), SResponse401(body=UnauthorizedResp)],
     )
     def post(self):
-        self.write("Hello, world")
+        params = RequestEnumQuery.model_validate_json(self.request.body)
+        self.write(params.model_dump_json())
 
 
 class AppWithSwagger(tornado.web.Application):
