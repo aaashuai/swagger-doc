@@ -1,6 +1,6 @@
 # SwaggerDoc   
 
-[![Python](https://img.shields.io/badge/Python-3.4+-blue.svg)](https://python.org/)
+[![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://python.org/)
 [![Tornado](https://img.shields.io/badge/Tornado-6.0.1+-blue.svg)](https://python.org/)
 
 ## About
