@@ -31,6 +31,9 @@ jobs:
         python install_deps.py
         pip install pytest
 
+    - name: Set PYTHONPATH
+      run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB_ENV
+
     - name: Run pytest
       run: |
         pytest
