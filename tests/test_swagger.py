@@ -671,3 +671,7 @@ def test_multi_part_request():
             }
         },
     }
+
+
+if __name__ == '__main__':
+    test_multi_part_request()

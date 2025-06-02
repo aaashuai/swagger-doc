@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Optional, Type, List, Union, Dict
 
-from pydantic import BaseModel, Field, root_validator, validator
+from pydantic import BaseModel, Field, model_validator, field_validator
 
 __all__ = [
     "SResponse",
@@ -86,7 +86,7 @@ def _parse_one_model(_item, definitions: dict, field: str, required: list):
 
 
 def _get_ref_model(ref: str, definitions: dict, field: str, description: str = None):
-    prefix = "#/definitions/"
+    prefix = "#/$defs/"
     d_name = ref.replace(prefix, "")
     item = definitions[d_name]
     if "enum" in item:
@@ -108,11 +108,11 @@ class SParam(BaseModel):
     @classmethod
     def gen_schema(cls) -> List[dict]:
         assert cls.__p_type__ is not None, ValueError("do not use Base Param")
-        schema = cls.schema()
+        schema = cls.model_json_schema()
 
         ret = []
         for field, _item in schema["properties"].items():
-            one_schema = _parse_one_model(_item, schema.get("definitions", {}), field, schema.get("required", []))
+            one_schema = _parse_one_model(_item, schema.get("$defs", {}), field, schema.get("required", []))
             one = {
                 "name": field,
                 "in": cls.__p_type__,
@@ -167,7 +167,7 @@ class SObjectMeta(BaseModel):
             for field, attrs in schema["properties"].items():
                 _properties[field] = _parse_one_model(
                     attrs,
-                    schema.get("definitions", {}),
+                    schema.get("$defs", {}),
                     field,
                     schema.get("required", []),
                 )
@@ -231,10 +231,10 @@ class SecurityModel(BaseModel):
     in_: Optional[SecurityIn] = Field(None, alias="in")
     scheme: Optional[SecuritySchema] = None
 
-    @root_validator
+    @model_validator(mode="before")
     def check_fields(cls, values):
         if values["type"] == SecurityType.apiKey:
-            if not values["in_"]:
+            if not values.get("in_"):
                 values["in_"] = SecurityIn.header
             assert values["name"], "请填写 name"
         elif values["type"] == SecurityType.http:
@@ -247,7 +247,7 @@ class SecurityModel(BaseModel):
 
 
 class SSecurity(BaseModel):
-    security: List[Union[SecurityModel, List[SecurityModel]]]
+    security: List[List[SecurityModel]]
 
     @staticmethod
     def _get_dict(data: BaseModel) -> dict:
@@ -298,32 +298,32 @@ class SResponse(BaseModel):
 
 
 class SResponse200(SResponse):
-    status_code = 200
-    description = "OK"
+    status_code: int = 200
+    description: str = "OK"
 
 
 class SResponse204(SResponse):
-    status_code = 204
-    description = "No Content"
+    status_code: int = 204
+    description: str = "No Content"
 
 
 class SResponse400(SResponse):
-    status_code = 400
-    description = "Bad Request"
+    status_code: int = 400
+    description: str = "Bad Request"
 
 
 class SResponse401(SResponse):
-    status_code = 401
-    description = "Unauthorized"
+    status_code: int = 401
+    description: str = "Unauthorized"
 
 
 class SResponse403(SResponse):
-    status_code = 403
-    description = "Forbidden"
+    status_code: int = 403
+    description: str = "Forbidden"
 
 
 class SResponse404(SResponse):
-    status_code = 404
+    status_code: int = 404
 
 
 class DocModel(BaseModel):
@@ -332,12 +332,12 @@ class DocModel(BaseModel):
     desc: str
     responses: List[SResponse]
     auth_required: bool
-    request_body: Type[SObjectMeta] = None
-    path_params: Type[SParam] = None
-    query_params: Type[SQuery] = None
-    header_params: Type[SHeader] = None
+    request_body: Optional[Type[SObjectMeta]] = None
+    path_params: Optional[Type[SParam]] = None
+    query_params: Optional[Type[SQuery]] = None
+    header_params: Optional[Type[SHeader]] = None
 
-    @validator("auth_required")
+    @field_validator("auth_required")
     def default_val(cls, val):
         if val is None:
             return True
