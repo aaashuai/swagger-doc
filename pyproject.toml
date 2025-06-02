@@ -33,7 +33,7 @@ build-backend = "setuptools.build_meta"
 include = ["swagger-doc"]
 
 [tool.setuptools.package-data]
-"swagger-doc" = ["*.py", "static/redoc_ui/*", "static/swagger_ui/*", "templates/*"]
+swagger_doc = ["*.py", "static/redoc_ui/*", "static/swagger_ui/*", "templates/*"]
 
 [tool.black]
 line-length = 119
