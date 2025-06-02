@@ -29,8 +29,8 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.packages.find]
-include = ["swagger-doc"]
+[tool.setuptools]
+packages = ["swagger_doc"]
 
 [tool.setuptools.package-data]
 swagger_doc = ["*.py", "static/redoc_ui/*", "static/swagger_ui/*", "templates/*"]
