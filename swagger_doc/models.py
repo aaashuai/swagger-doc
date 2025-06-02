@@ -231,23 +231,23 @@ class SecurityModel(BaseModel):
     in_: Optional[SecurityIn] = Field(None, alias="in")
     scheme: Optional[SecuritySchema] = None
 
-    @model_validator(mode="before")
-    def check_fields(cls, values):
-        if values["type"] == SecurityType.apiKey:
-            if not values.get("in_"):
-                values["in_"] = SecurityIn.header
-            assert values["name"], "请填写 name"
-        elif values["type"] == SecurityType.http:
-            values["name"] = "BearerAuthentication"
-            assert values["scheme"], "请填写 schema"
+    @model_validator(mode="after")
+    def check_fields(self):
+        if self.type == SecurityType.apiKey:
+            if not self.in_:
+                self.in_ = SecurityIn.header
+            assert self.name, "请填写 name"
+        elif self.type == SecurityType.http:
+            self.name = "BearerAuthentication"
+            assert self.scheme, "请填写 schema"
         else:
             raise ValueError("暂不支持其他类型")
 
-        return values
+        return self
 
 
 class SSecurity(BaseModel):
-    security: List[List[SecurityModel]]
+    security: List[Union[List[SecurityModel], SecurityModel]]
 
     @staticmethod
     def _get_dict(data: BaseModel) -> dict:

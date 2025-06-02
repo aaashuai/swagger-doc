@@ -78,127 +78,115 @@ def post(id):
 def test_gen_doc():
     print(post.__swagger__.gen_doc())
     assert post.__swagger__.gen_doc() == {
-        "tags": ["eis"],
-        "summary": "eis",
         "description": "eis",
         "parameters": [
             {
-                "name": "id",
-                "in": "path",
                 "description": "请求ID",
-                "required": True,
-                "schema": {"description": "请求ID", "type": "integer", "required": True},
                 "example": 123,
-            },
-            {
-                "name": "Limit",
-                "in": "query",
-                "description": "页限制",
+                "in": "path",
+                "name": "id",
                 "required": True,
-                "schema": {"description": "页限制", "type": "integer", "required": True},
+                "schema": {"description": "请求ID", "required": True, "type": "integer"},
             },
             {
-                "name": "Offset",
+                "description": "页限制",
                 "in": "query",
+                "name": "Limit",
+                "required": True,
+                "schema": {"description": "页限制", "required": True, "type": "integer"},
+            },
+            {
                 "description": "偏移量",
+                "in": "query",
+                "name": "Offset",
                 "required": False,
-                "schema": {"description": "偏移量", "type": "integer", "required": False},
+                "schema": {
+                    "anyOf": [
+                        {"description": "", "required": False, "type": "integer"},
+                        {"description": "", "required": False, "type": "null"},
+                    ]
+                },
             },
         ],
         "requestBody": {
             "content": {
                 "application/json": {
+                    "example": {
+                        "age": 34,
+                        "eLike": ["a", "b", "c"],
+                        "favorite": {"name": "句子"},
+                        "like": [{"name": "李四"}, {"name": "王五"}],
+                        "name": "张三",
+                        "rLike": {"like": "abc"},
+                    },
                     "schema": {
-                        "type": "object",
-                        "description": "request body",
+                        "description": "request " "body",
                         "properties": {
-                            "Name": {
-                                "description": "姓名",
-                                "type": "string",
-                                "required": True,
-                            },
-                            "like": {
+                            "ELike": {
+                                "description": "elike",
+                                "items": {"description": "", "required": True, "type": "string"},
                                 "type": "array",
-                                "items": {
-                                    "type": "object",
-                                    "properties": {
-                                        "name": {
-                                            "description": "喜爱东西的名称",
-                                            "type": "string",
-                                            "required": True,
-                                        }
-                                    },
-                                },
+                            },
+                            "Name": {"description": "姓名", "required": True, "type": "string"},
+                            "age": {
+                                "anyOf": [
+                                    {"description": "", "required": True, "type": "integer"},
+                                    {"description": "", "required": True, "type": "null"},
+                                ]
                             },
                             "favorite": {
-                                "type": "object",
                                 "properties": {
-                                    "name": {
-                                        "description": "喜爱东西的名称",
-                                        "type": "string",
-                                        "required": True,
-                                    }
+                                    "name": {"description": "喜爱东西的名称", "required": True, "type": "string"}
                                 },
+                                "type": "object",
+                            },
+                            "like": {
+                                "items": {
+                                    "properties": {
+                                        "name": {"description": "喜爱东西的名称", "required": True, "type": "string"}
+                                    },
+                                    "type": "object",
+                                },
+                                "type": "array",
                             },
                             "rLike": {
-                                "type": "object",
                                 "properties": {
                                     "like": {
-                                        "type": "object",
                                         "properties": {
                                             "name": {
                                                 "description": "喜爱东西的名称",
-                                                "type": "string",
                                                 "required": True,
+                                                "type": "string",
                                             }
                                         },
+                                        "type": "object",
                                     }
                                 },
-                            },
-                            "ELike": {
-                                "type": "array",
-                                "items": {"description": "", "required": True, "type": "string"},
-                                "description": "elike",
-                            },
-                            "age": {
-                                "description": "年龄",
-                                "type": "integer",
-                                "required": False,
+                                "type": "object",
                             },
                         },
-                    },
-                    "example": {
-                        "name": "张三",
-                        "like": [{"name": "李四"}, {"name": "王五"}],
-                        "favorite": {"name": "句子"},
-                        "rLike": {"like": "abc"},
-                        "eLike": ["a", "b", "c"],
-                        "age": 34,
+                        "type": "object",
                     },
                 }
             }
         },
         "responses": {
             "200": {
-                "description": "OK",
                 "content": {
                     "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "description": "request body",
-                            "properties": {
-                                "name": {
-                                    "description": "姓名",
-                                    "type": "string",
-                                    "required": True,
-                                }
-                            },
-                        },
                         "example": {"name": "李四"},
+                        "schema": {
+                            "description": "request " "body",
+                            "properties": {"name": {"description": "姓名", "required": True, "type": "string"}},
+                            "type": "object",
+                        },
                     }
                 },
+                "description": "OK",
             }
         },
+        "summary": "eis",
+        "tags": ["eis"],
     }
 
 
@@ -253,95 +241,133 @@ def test_enum():
         "description": "eis",
         "parameters": [
             {
-                "name": "name",
-                "in": "query",
                 "description": "",
+                "in": "query",
+                "name": "name",
                 "required": True,
-                "schema": {"description": "", "type": "string", "required": True},
+                "schema": {"description": "", "required": True, "type": "string"},
             },
             {
-                "name": "status",
-                "in": "query",
                 "description": "状态",
-                "required": True,
-                "schema": {"allOf": [{"description": "状态 1:online, 2:offline", "type": "integer", "enum": [1, 2]}]},
                 "example": 1,
+                "in": "query",
+                "name": "status",
+                "required": True,
+                "schema": {"description": "状态 1:online, 2:offline", "enum": [1, 2], "type": "integer"},
             },
             {
-                "name": "bstatus",
+                "description": "状态 1:online, 2:offline/b状态 1:online, " "2:offline/",
                 "in": "query",
-                "description": "状态 1:online, 2:offline/b状态 1:online, 2:offline/",
+                "name": "bstatus",
                 "required": True,
                 "schema": {
                     "anyOf": [
-                        {"description": "状态 1:online, 2:offline", "type": "integer", "enum": [1, 2]},
-                        {"description": "b状态 1:online, 2:offline", "type": "integer", "enum": [1, 2]},
-                        {"description": "", "type": "string", "required": True},
+                        {"description": "状态 1:online, 2:offline", "enum": [1, 2], "type": "integer"},
+                        {"description": "b状态 1:online, 2:offline", "enum": [1, 2], "type": "integer"},
+                        {"description": "", "required": True, "type": "string"},
                     ]
                 },
             },
             {
-                "name": "bstatusListp",
+                "description": "/",
                 "in": "query",
-                "description": "",
-                "required": False,
+                "name": "bstatusListp",
+                "required": True,
                 "schema": {
-                    "type": "array",
-                    "items": {
-                        "anyOf": [
-                            {"description": "状态 1:online, 2:offline", "type": "integer", "enum": [1, 2]},
-                            {"description": "b状态 1:online, 2:offline", "type": "integer", "enum": [1, 2]},
-                            {"description": "", "type": "string", "required": False},
-                        ]
-                    },
+                    "anyOf": [
+                        {
+                            "items": {
+                                "anyOf": [
+                                    {
+                                        "description": "状态 " "1:online, " "2:offline",
+                                        "enum": [1, 2],
+                                        "type": "integer",
+                                    },
+                                    {
+                                        "description": "b状态 " "1:online, " "2:offline",
+                                        "enum": [1, 2],
+                                        "type": "integer",
+                                    },
+                                    {"description": "", "required": True, "type": "string"},
+                                ]
+                            },
+                            "type": "array",
+                        },
+                        {"description": "", "required": True, "type": "null"},
+                    ]
                 },
             },
         ],
         "requestBody": {
             "content": {
                 "application/json": {
+                    "example": {"status": 1},
                     "schema": {
-                        "type": "object",
-                        "description": "request body",
+                        "description": "request " "body",
                         "properties": {
-                            "name": {"description": "", "type": "string", "required": True},
-                            "status": {"description": "状态 1:online, 2:offline", "type": "integer", "enum": [1, 2]},
                             "bstatus": {
                                 "anyOf": [
-                                    {"description": "状态 1:online, 2:offline", "type": "integer", "enum": [1, 2]},
-                                    {"description": "b状态 1:online, 2:offline", "type": "integer", "enum": [1, 2]},
-                                    {"description": "", "type": "string", "required": True},
+                                    {
+                                        "description": "状态 " "1:online, " "2:offline",
+                                        "enum": [1, 2],
+                                        "type": "integer",
+                                    },
+                                    {
+                                        "description": "b状态 " "1:online, " "2:offline",
+                                        "enum": [1, 2],
+                                        "type": "integer",
+                                    },
+                                    {"description": "", "required": True, "type": "string"},
                                 ]
                             },
                             "bstatusListp": {
-                                "type": "array",
-                                "items": {
-                                    "anyOf": [
-                                        {"description": "状态 1:online, 2:offline", "type": "integer", "enum": [1, 2]},
-                                        {"description": "b状态 1:online, 2:offline", "type": "integer", "enum": [1, 2]},
-                                        {"description": "", "type": "string", "required": False},
-                                    ]
-                                },
+                                "anyOf": [
+                                    {
+                                        "items": {
+                                            "anyOf": [
+                                                {
+                                                    "description": "状态 " "1:online, " "2:offline",
+                                                    "enum": [1, 2],
+                                                    "type": "integer",
+                                                },
+                                                {
+                                                    "description": "b状态 " "1:online, " "2:offline",
+                                                    "enum": [1, 2],
+                                                    "type": "integer",
+                                                },
+                                                {"description": "", "required": True, "type": "string"},
+                                            ]
+                                        },
+                                        "type": "array",
+                                    },
+                                    {"description": "", "required": True, "type": "null"},
+                                ]
+                            },
+                            "name": {"description": "", "required": True, "type": "string"},
+                            "status": {
+                                "description": "状态 " "1:online, " "2:offline",
+                                "enum": [1, 2],
+                                "type": "integer",
                             },
                         },
+                        "type": "object",
                     },
-                    "example": {"status": 1},
                 }
             }
         },
         "responses": {
             "200": {
-                "description": "OK",
                 "content": {
                     "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "description": "request body",
-                            "properties": {"name": {"description": "姓名", "type": "string", "required": True}},
-                        },
                         "example": {"name": "李四"},
+                        "schema": {
+                            "description": "request " "body",
+                            "properties": {"name": {"description": "姓名", "required": True, "type": "string"}},
+                            "type": "object",
+                        },
                     }
                 },
+                "description": "OK",
             }
         },
     }
@@ -379,138 +405,118 @@ def test_description():
 
     print(post.__swagger__.gen_doc())
     assert post.__swagger__.gen_doc() == {
-        "tags": ["eis"],
-        "summary": "eis",
         "description": "eis",
         "parameters": [
             {
-                "name": "id",
-                "in": "path",
                 "description": "请求ID",
-                "required": True,
-                "schema": {"description": "请求ID", "type": "integer", "required": True},
                 "example": 123,
-            },
-            {
-                "name": "Limit",
-                "in": "query",
-                "description": "页限制",
+                "in": "path",
+                "name": "id",
                 "required": True,
-                "schema": {"description": "页限制", "type": "integer", "required": True},
+                "schema": {"description": "请求ID", "required": True, "type": "integer"},
             },
             {
-                "name": "Offset",
+                "description": "页限制",
                 "in": "query",
+                "name": "Limit",
+                "required": True,
+                "schema": {"description": "页限制", "required": True, "type": "integer"},
+            },
+            {
                 "description": "偏移量",
+                "in": "query",
+                "name": "Offset",
                 "required": False,
-                "schema": {"description": "偏移量", "type": "integer", "required": False},
+                "schema": {
+                    "anyOf": [
+                        {"description": "", "required": False, "type": "integer"},
+                        {"description": "", "required": False, "type": "null"},
+                    ]
+                },
             },
         ],
         "requestBody": {
             "content": {
                 "application/json": {
+                    "example": {
+                        "age": 34,
+                        "eLike": ["a", "b", "c"],
+                        "favorite": {"name": "句子"},
+                        "like": [{"name": "李四"}, {"name": "王五"}],
+                        "name": "张三",
+                        "rLike": {"like": "abc"},
+                    },
                     "schema": {
-                        "type": "object",
-                        "description": "request body",
+                        "description": "request " "body",
                         "properties": {
-                            "Name": {
-                                "description": "姓名",
-                                "type": "string",
-                                "required": True,
-                            },
-                            "like": {
+                            "ELike": {
+                                "description": "elike",
+                                "items": {"description": "", "required": True, "type": "string"},
                                 "type": "array",
-                                "items": {
-                                    "type": "object",
-                                    "properties": {
-                                        "name": {
-                                            "description": "喜爱东西的名称",
-                                            "type": "string",
-                                            "required": True,
-                                        }
-                                    },
-                                },
-                                "description": "i am like",
+                            },
+                            "Name": {"description": "姓名", "required": True, "type": "string"},
+                            "age": {
+                                "anyOf": [
+                                    {"description": "", "required": True, "type": "integer"},
+                                    {"description": "", "required": True, "type": "null"},
+                                ]
                             },
                             "favorite": {
-                                "allOf": [
-                                    {
-                                        "type": "object",
+                                "description": "i " "am " "favorite",
+                                "properties": {
+                                    "name": {"description": "喜爱东西的名称", "required": True, "type": "string"}
+                                },
+                                "type": "object",
+                            },
+                            "like": {
+                                "description": "i " "am " "like",
+                                "items": {
+                                    "properties": {
+                                        "name": {"description": "喜爱东西的名称", "required": True, "type": "string"}
+                                    },
+                                    "type": "object",
+                                },
+                                "type": "array",
+                            },
+                            "rLike": {
+                                "description": "i " "am " "rLike",
+                                "properties": {
+                                    "like": {
                                         "properties": {
                                             "name": {
                                                 "description": "喜爱东西的名称",
-                                                "type": "string",
                                                 "required": True,
+                                                "type": "string",
                                             }
                                         },
-                                        "description": "i am favorite",
-                                    }
-                                ]
-                            },
-                            "rLike": {
-                                "allOf": [
-                                    {
                                         "type": "object",
-                                        "properties": {
-                                            "like": {
-                                                "type": "object",
-                                                "properties": {
-                                                    "name": {
-                                                        "description": "喜爱东西的名称",
-                                                        "type": "string",
-                                                        "required": True,
-                                                    }
-                                                },
-                                            }
-                                        },
-                                        "description": "i am rLike",
                                     }
-                                ]
-                            },
-                            "ELike": {
-                                "type": "array",
-                                "items": {"description": "", "required": True, "type": "string"},
-                                "description": "elike",
-                            },
-                            "age": {
-                                "description": "年龄",
-                                "type": "integer",
-                                "required": False,
+                                },
+                                "type": "object",
                             },
                         },
-                    },
-                    "example": {
-                        "name": "张三",
-                        "like": [{"name": "李四"}, {"name": "王五"}],
-                        "favorite": {"name": "句子"},
-                        "rLike": {"like": "abc"},
-                        "eLike": ["a", "b", "c"],
-                        "age": 34,
+                        "type": "object",
                     },
                 }
             }
         },
         "responses": {
             "200": {
-                "description": "OK",
                 "content": {
                     "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "description": "request body",
-                            "properties": {
-                                "name": {
-                                    "description": "姓名",
-                                    "type": "string",
-                                    "required": True,
-                                }
-                            },
-                        },
                         "example": {"name": "李四"},
+                        "schema": {
+                            "description": "request " "body",
+                            "properties": {"name": {"description": "姓名", "required": True, "type": "string"}},
+                            "type": "object",
+                        },
                     }
                 },
+                "description": "OK",
             }
         },
+        "summary": "eis",
+        "tags": ["eis"],
     }
 
 
@@ -671,7 +677,3 @@ def test_multi_part_request():
             }
         },
     }
-
-
-if __name__ == '__main__':
-    test_multi_part_request()
