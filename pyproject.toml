@@ -1,9 +1,37 @@
+[project]
+name = "swagger-doc"
+version = "0.0.11"
+description = "swagger doc for tornado"
+readme = "README.md"
+authors = [
+    { name = "aaashuai", email = "nsity223@gmail.com" }
+]
+license = { text = "MIT" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
+dependencies = [
+    "pydantic>=1.8.2,<2.0",
+    "tornado>=6.0.1",
+    "Jinja2>=2.11.2",
+    "PyYaml>=5.3.1"
+]
+requires-python = ">=3.6"
+
 [build-system]
 requires = [
 "setuptools>=78.1.1",
 "wheel",
 ]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["swagger-doc"]
+
+[tool.setuptools.package-data]
+"swagger-doc" = ["*.py", "static/redoc_ui/*", "static/swagger_ui/*", "templates/*"]
 
 [tool.black]
 line-length = 119
